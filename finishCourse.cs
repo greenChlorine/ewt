@@ -6,33 +6,33 @@ using System.Windows.Forms;
 
 namespace ewt360
 {
-    public partial class Form1 : Form
+    public partial class finishCourse : Form
     {
         //courseId和lessonId用于发送bfe请求定位课程
-        string courseId;
-        string lessonId;
-        int postTimes;//用于确定看多长时间
-        string sessionId;//请求头X-Bfe-Session-Id用
-        string secret;//signature的密钥
-        string clientIp;
-        int index = 1;//uuid要添加请求index
-        string beginTS;//开始请求的时间戳
-        string uuid;
+        public string courseId;//parentContentId--->courseId
+        public string lessonId;//contentId--->lessonId
+        public int length;//视频长度，单位s
 
-        public Form1(string _contentId, string _parentContentId, int _length)
+        private int postTimes;//用于确定看多长时间
+        private string sessionId;//请求头X-Bfe-Session-Id用
+        private string secret;//signature的密钥
+        private string clientIp;
+        private int index = 1;//uuid要添加请求index
+        private string beginTS;//开始请求的时间戳
+        private string uuid;
+
+        public finishCourse(string a, string b, int c)
         {
             InitializeComponent();
 
-            //对应关系
-            //json中名称/网页请求名称
-            //contentId--->lessonId
-            //parentContentId--->courseId
-            lessonId = _contentId;
-            courseId = _parentContentId;
-            postTimes = (int)((_length * 0.8) / 60 / 2) + 1;//相当于有多少分
-            //显示视频时间
+            courseId = a;
+            lessonId = b;
+            length = c;
 
-            label1.Text = (int)(_length / 60) + ":" + _length % 60;
+            postTimes = (int)((length * 0.8) / 60 / 2) + 1;//相当于有多少分
+            //超过80%就算完成
+            //显示视频时间
+            label1.Text = (int)(length / 60) + ":" + length % 60;
         }
         private string getSignature(string action, string duration, string ts)
         {
@@ -114,6 +114,11 @@ namespace ewt360
 
             postBFE("1", "0", "1", "0");
             timer1.Enabled = true;
+        }
+
+        private void finishCourse_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            main.jump = true;
         }
     }
 }

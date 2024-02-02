@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace ewt360
@@ -9,9 +8,9 @@ namespace ewt360
         json complete;
         json incomplete;
 
-        //两个listbox的pannel，在pannel滚动事件中运用
-        private Panel finished_pn;
-        private Panel not_pn;
+        public static bool jump = false;
+
+
         public main()
         {
             InitializeComponent();
@@ -19,7 +18,12 @@ namespace ewt360
 
         private void main_Load(object sender, EventArgs e)
         {
-            
+            //设置控件属性
+            notlist.AutoScroll = true;//自动滚动
+            finishlist.AutoScroll = true;
+
+
+
             UserInfo.getbasicinfo();
 
             //下面开始处理数据，数据都储存在UserInfo类中
@@ -38,8 +42,8 @@ namespace ewt360
                 dateTimePicker1.Value = start;
 
             //显示用户信息
-            json info = new json(request.get(ewt.getUserInfo,true));
-            json classinfo = new json(request.get(ewt.getMyClassList,true));
+            json info = new json(request.get(ewt.getUserInfo, true));
+            json classinfo = new json(request.get(ewt.getMyClassList, true));
             this.Text = $"欢迎来自{info.getNameValue("schoolName")}{classinfo.getNameValue("className")}的{info.getNameValue("realName")}同学，班主任是{classinfo.getNameValue("headTeacherName")}老师";
 
             //显示今天的任务列表
@@ -87,7 +91,7 @@ namespace ewt360
             //获取当日的任务进度
             string taskproreqdata = "{\"dayId\": [\"" + dayId + "\"],\"day\": " + day + ",\"homeworkIds\": [" + UserInfo.homeworkId + "],\"isSelfTask\": false,\"userOptionTaskId\": null,\"schoolId\": " + UserInfo.schoolId + ",\"sceneId\": \"111\"}";
             json taskreq = new json(request.post(true, ewt.getTaskProcess, taskproreqdata));
-            double rate = double.Parse(taskreq.getNameValue("progressRate"))*100;
+            double rate = double.Parse(taskreq.getNameValue("progressRate")) * 100;
             progressBar1.Value = (int)rate;
             string count = taskreq.getNameValue("count");
             string finishCount = taskreq.getNameValue("finishCount");
@@ -95,9 +99,14 @@ namespace ewt360
             label1.Text = string.Format("今日共{0}个任务，已完成{1}个，未完成{2}个", count, finishCount, no);
             label2.Text = rate + "%";
 
-            //为listbox添加项
-            notlist.Controls.Clear();
-            finishlist.Controls.Clear();
+            //为listbox清空项
+            //cleanControls(notlist);
+            //cleanControls(finishlist);
+
+            cleanControls(notlist);
+            cleanControls(finishlist);
+
+
             //string status = "1";
             //1为已完成，0为未完成
 
@@ -110,80 +119,70 @@ namespace ewt360
 
         }
 
+        private void cleanControls(FlowLayoutPanel list)
+        {
+            foreach (Control c1 in list.Controls)
+            {
+                //pannel
+                foreach (Control c2 in c1.Controls)
+                {
+                    foreach (Control c3 in c2.Controls)
+                    {
+                        c3.Dispose();
+                    }
+                }
+            }
+            list.Controls.Clear();
+        }
 
         //为listbox添加项
-        private void addItems(int status,string dayId,string day)
+        private void addItems(int status, string dayId, string day)
         {
+
+
             //先请求数据在添加
 
             string payload = "{\"dayId\":[\"" + dayId + "\"],\"day\":" + day + ",\"status\":" + status + ",\"homeworkIds\":[" + UserInfo.homeworkId + "],\"isSelfTask\":false,\"userOptionTaskId\":null,\"pageIndex\":1,\"pageSize\":30,\"missionType\":0,\"schoolId\":" + UserInfo.schoolId + ",\"sceneId\":\"136\"}";
             json data = new json(request.post(true, ewt.getpageHomeworkTasks, payload));
+            if (status == 0) incomplete = data;
 
             //请求得到的数据，标题，进度，lessonId,图片
-            string[] titles = data.getNameValueArr("title");
-            string[] ratio = data.getNameValueArr("ratio");
-            string[] lessonId = data.getNameValueArr("contentId");
-            string[] imgs = data.getNameValueArr("imgUrl");
+            //试卷的lessonid，contentid,imgs
+            string[] titles = data.getNameValueArr("title");//标题
+            string[] ratio = data.getNameValueArr("ratio");//该课程的进度
+            string[] lessonId = data.getNameValueArr("contentId");//lessonId
+            string[] imgs = data.getNameValueArr("imgUrl");//课程封面
+            string[] type = data.getNameValueArr("contentTypeName");
 
 
-
-            //根据status指定控件
-            ListBox lb = status == 0 ? (ListBox)notlist : (ListBox)finishlist;
-            Panel pn = new Panel();
-            int item_amount=titles.Length;//拿titile获取个数，其实四个都一样
-            const int item_height = 70;
-
-            //设置panel的
-            pn.Name = "pn";
-            pn.Width = lb.Width;
-            pn.Height = item_amount * item_height;
-            pn.Parent = lb;
-            pn.Location = new Point(0, 0);
-
-            //为listbox创建滚动条
-            VScrollBar vbar = new VScrollBar();
-            vbar.Height = lb.Height;
-            vbar.Parent = lb;
-            vbar.Dock= DockStyle.Right;
-            vbar.Maximum = item_amount * item_height;
-            vbar.Scroll += vbar_scroll;
+            int item_amount = titles.Length;
+            FlowLayoutPanel panel = status == 0 ? notlist : finishlist;
 
             //为panel添加自定义控件
-            for(int i = 0; i < item_amount; i++)
+            for (int i = 0; i < item_amount; i++)
             {
-                var item = new courseitem(i, titles[i], ratio[i], lessonId[i], imgs[i]);
-                item.Parent = pn;
-                item.Top = i * item_height;
-                pn.Controls.Add(item);
+
+                var item = new courseitem
+                {
+                    //传参
+                    index = i + 1,//课程结束从1开始，要加1
+                    title = titles[i],
+                    ratio = ratio[i],
+                    lessonId = lessonId[i],
+                    imgurl = imgs[i],
+                    type = type[i],
+
+                };
+
+                //添加控件
+                panel.Controls.Add(item);
             }
-
-            if(status == 0)
-            {
-                not_pn = pn;
-                incomplete = data;
-            }
-            else
-            {
-                finished_pn = pn;
-                complete = data;
-            }
-
-            //为listbox添加pannel
-            lb.Controls.Add(pn);
-
-        }
-
-        private void vbar_scroll(object sender, EventArgs e)
-        {
-            var bar = (VScrollBar)sender;
-            var pn = bar.Parent.Name == "notlist" ? not_pn : finished_pn;
-            pn.Top = -bar.Value;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             DateTime changed = dateTimePicker1.Value.AddDays(-1);
-            if (changed<dateTimePicker1.MinDate)
+            if (changed < dateTimePicker1.MinDate)
             {
                 MessageBox.Show("当前已是最小的日期了!", "Wrong", 0, MessageBoxIcon.Error);
                 return;
@@ -195,7 +194,7 @@ namespace ewt360
         private void button3_Click(object sender, EventArgs e)
         {
             DateTime changed = dateTimePicker1.Value.AddDays(1);
-            if (changed>dateTimePicker1.MaxDate)
+            if (changed > dateTimePicker1.MaxDate)
             {
                 MessageBox.Show("当前已是最大的日期了!", "Wrong", 0, MessageBoxIcon.Error);
                 return;
@@ -220,24 +219,42 @@ namespace ewt360
                 display();
                 return;
             }
-           
+
 
             for (int i = 0; i < contentId.Length; i++)
             {
+                if (jump)
+                {
+                    jump = false;
+                    return;
+                }
+
                 if (type[i] == "试卷")
                 {
-                    MessageBox.Show("试卷不需要看！");
+                    //MessageBox.Show("试卷不需要看！");
+                    Console.WriteLine("已经为你跳过试卷了！");
                     continue;
                 }
-                new Form1(contentId[i], parentContentId[i], int.Parse(length[i])).ShowDialog();
+                //new Form1(contentId[i], parentContentId[i], int.Parse(length[i])).ShowDialog();
+                var frm = new finishCourse(parentContentId[i], contentId[i], int.Parse(length[i]));
 
+                frm.ShowDialog();
+
+                display();//刷新菜单
             }
-                
+
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            new Quick_Complete(incomplete.getNameValueArr("contentId")[0], incomplete.getNameValueArr("parentContentId")[0], incomplete.getNameValueArr("duration")[0]).ShowDialog();
+            new Quick_Complete(incomplete.getNameValueArr("parentContentId")[0], incomplete.getNameValueArr("contentId")[0], incomplete.getNameValueArr("duration")[0]).ShowDialog();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            notlist.Dispose();
+            finishlist.Dispose();
+
         }
     }
 }

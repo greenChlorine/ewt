@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 
 namespace ewt360
@@ -41,9 +39,9 @@ namespace ewt360
         //    }
         //}
 
-        public static string post(bool iftoken,string url,string data)
+        public static string post(bool iftoken, string url, string data)
         {
-            Console.WriteLine("Post Request:\n\t(url:){0}\n\t(data:){1}\n",url,data);
+            Console.WriteLine("Post Request:\n\t(url:){0}\n\t(data:){1}\n", url, data);
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
             req.Method = "POST";
             req.ContentType = "application/json";
@@ -86,7 +84,7 @@ namespace ewt360
             */
             using (Stream reqStream = req.GetRequestStream())//写入数据
             {
-                reqStream.Write(bdata,0,bdata.Length);
+                reqStream.Write(bdata, 0, bdata.Length);
                 reqStream.Close();
             }
 
@@ -94,6 +92,7 @@ namespace ewt360
         }
         public static string getRespone(HttpWebRequest request)
         {
+            //操作超时
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
                 using (Stream stream = response.GetResponseStream())
@@ -101,7 +100,7 @@ namespace ewt360
                     using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
                     {
                         string resp = reader.ReadToEnd();
-                        Console.WriteLine("Recieved the respone:\n\t(Respone:){0}\n",resp);
+                        Console.WriteLine("Recieved the respone:\n\t(Respone:){0}\n", resp);
                         return resp;
                     }
                 }

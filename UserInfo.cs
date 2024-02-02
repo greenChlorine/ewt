@@ -24,7 +24,7 @@
         }
         public static void getSummaryInfo()
         {
-            json rt = new json(request.get(string.Format(ewt.getHomeworkSummaryInfo,schoolId), true));
+            json rt = new json(request.get(string.Format(ewt.getHomeworkSummaryInfo, schoolId), true));
             homeworkId = rt.getNameValue("homeworkIds").Replace("[", "").Replace("]", "");
             starttime = long.Parse(rt.getNameValue("startDate"));
             endtime = long.Parse(rt.getNameValue("endDate"));

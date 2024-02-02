@@ -1,6 +1,6 @@
 ﻿namespace ewt360
 {
-    partial class Form1
+    partial class finishCourse
     {
         /// <summary>
         /// Required designer variable.
@@ -60,7 +60,7 @@
             this.listBox1.Size = new System.Drawing.Size(980, 349);
             this.listBox1.TabIndex = 2;
             // 
-            // Form1
+            // finishCourse
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -68,8 +68,9 @@
             this.ClientSize = new System.Drawing.Size(1016, 450);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.label1);
-            this.Name = "Form1";
+            this.Name = "finishCourse";
             this.Text = "Finish The Course";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.finishCourse_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

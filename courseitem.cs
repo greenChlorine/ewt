@@ -1,32 +1,48 @@
-﻿using System;
-using System.Drawing;
+﻿using ewt360.Properties;
+using System;
 using System.Windows.Forms;
 
 namespace ewt360
 {
-    public partial class courseitem : UserControl
+    public partial class courseitem : UserControl, IDisposable
     {
-        string text;
-        string lessonId;
-        string imgurl;
-        int index;
-        public courseitem(int _index, string _className,string _ratio,string _lessonId,string _imgurl)
+        public string title;
+        public string lessonId;
+        public string imgurl;
+        public string ratio;
+        public string type;
+        public int index;
+        public courseitem()
         {
             InitializeComponent();
-            text = _className;
-            index = _index;
-            lessonId = _lessonId;
-            imgurl = _imgurl;
             //label3.Text = double.Parse(_ratio)*100+"%";
         }
 
         private void courseitem_Load(object sender, EventArgs e)
         {
-            this.Location = new Point(0, this.Height * index);
-            label1.Text = string.Format("第{0}节：", index + 1);
-            label2.Text = text;
+            //this.Location = new Point(0, this.Height * index);
+            label1.Text = string.Format("第{0}节：", index);//设置第几节
 
-            pictureBox1.LoadAsync(imgurl);
+            if (title.Length >= 12)
+                label2.Text = title.Substring(0, 12) + "...";
+            else
+                label2.Text = title;//课程标题
+
+
+            //显示进度条与图片
+            typeimg.SizeMode = PictureBoxSizeMode.Zoom;
+            if (type == "试卷")
+            {
+                ratiobar.Visible = false;
+                typeimg.Image = Resources.paper;
+            }
+            else
+            {
+                typeimg.Image = Resources.video;
+                ratiobar.Maximum = 100;
+                ratiobar.Value = (int)(double.Parse(ratio) * 100);
+            }
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -53,5 +69,17 @@ namespace ewt360
             else
             { MessageBox.Show("Cannot find the pdf source!"); }
         }
+
+        private void courseitem_ControlRemoved(object sender, ControlEventArgs e)
+        {
+            Console.WriteLine("");
+        }
+
+        private void courseitem_Leave(object sender, EventArgs e)
+        {
+            Console.WriteLine();
+        }
+
+
     }
 }

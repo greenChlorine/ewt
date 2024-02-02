@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace ewt360
@@ -17,7 +16,7 @@ namespace ewt360
 
             //先展示登录窗口，在登录窗口实现自动登录
             Application.Run(new loginfrm());
-            if (UserInfo.token == null) {return; }
+            if (UserInfo.token == null) { return; }
             Application.Run(new main());
         }
     }

@@ -14,7 +14,7 @@ namespace ewt360
             answer = _answer;
             count = _count;
 
-            answer.jsonData = answer.jsonData.Replace("\\\"","\'");
+            answer.jsonData = answer.jsonData.Replace("\\\"", "\'");
         }
 
         private void button1_Click(object sender, EventArgs e)

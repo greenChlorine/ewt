@@ -79,11 +79,11 @@
       <DependentUpon>courseitem.cs</DependentUpon>
     </Compile>
     <Compile Include="ewt.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="finishCourse.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="finishCourse.Designer.cs">
+      <DependentUpon>finishCourse.cs</DependentUpon>
     </Compile>
     <Compile Include="loginfrm.cs">
       <SubType>Form</SubType>
@@ -129,8 +129,8 @@
     <EmbeddedResource Include="courseitem.resx">
       <DependentUpon>courseitem.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="finishCourse.resx">
+      <DependentUpon>finishCourse.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="loginfrm.resx">
       <DependentUpon>loginfrm.cs</DependentUpon>
@@ -181,6 +181,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\video.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paper.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
