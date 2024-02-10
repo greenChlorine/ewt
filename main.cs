@@ -5,12 +5,34 @@ namespace ewt360
 {
     public partial class main : Form
     {
-        json complete;
-        json incomplete;
+        //json complete;
+        //json incompletedata;
+        public class course_data
+        {
+            public string[] title;
+            public string[] length;
+            public string[] course_id;
+            public string[] content_id;
+            public string[] subjectName;
+            public string[] contentType;
+            public string[] ratio;
+            public int amout;
 
-        public static bool jump = false;
+            public course_data(json jsondata)
+            {
+                title = jsondata.getNameValueArr("title");
+                length = jsondata.getNameValueArr("duration");
+                course_id = jsondata.getNameValueArr("parentContentId");
+                content_id = jsondata.getNameValueArr("contentId");
+                subjectName = jsondata.getNameValueArr("subjectName");
+                contentType = jsondata.getNameValueArr("contentTypeName");
+                ratio = jsondata.getNameValueArr("ratio");
 
+                amout = int.Parse(jsondata.getNameValue("totalRecords"));
+            }
 
+        }
+        public course_data unfinished_data;
         public main()
         {
             InitializeComponent();
@@ -21,8 +43,6 @@ namespace ewt360
             //设置控件属性
             notlist.AutoScroll = true;//自动滚动
             finishlist.AutoScroll = true;
-
-
 
             UserInfo.getbasicinfo();
 
@@ -123,13 +143,9 @@ namespace ewt360
         {
             foreach (Control c1 in list.Controls)
             {
-                //pannel
-                foreach (Control c2 in c1.Controls)
+                foreach(Control c2 in c1.Controls)
                 {
-                    foreach (Control c3 in c2.Controls)
-                    {
-                        c3.Dispose();
-                    }
+                    c2.Dispose();
                 }
             }
             list.Controls.Clear();
@@ -138,39 +154,36 @@ namespace ewt360
         //为listbox添加项
         private void addItems(int status, string dayId, string day)
         {
-
-
             //先请求数据在添加
 
             string payload = "{\"dayId\":[\"" + dayId + "\"],\"day\":" + day + ",\"status\":" + status + ",\"homeworkIds\":[" + UserInfo.homeworkId + "],\"isSelfTask\":false,\"userOptionTaskId\":null,\"pageIndex\":1,\"pageSize\":30,\"missionType\":0,\"schoolId\":" + UserInfo.schoolId + ",\"sceneId\":\"136\"}";
-            json data = new json(request.post(true, ewt.getpageHomeworkTasks, payload));
-            if (status == 0) incomplete = data;
+            json json_data = new json(request.post(true, ewt.getpageHomeworkTasks, payload));
 
             //请求得到的数据，标题，进度，lessonId,图片
             //试卷的lessonid，contentid,imgs
-            string[] titles = data.getNameValueArr("title");//标题
-            string[] ratio = data.getNameValueArr("ratio");//该课程的进度
-            string[] lessonId = data.getNameValueArr("contentId");//lessonId
-            string[] imgs = data.getNameValueArr("imgUrl");//课程封面
-            string[] type = data.getNameValueArr("contentTypeName");
+            //string[] titles = data.getNameValueArr("title");//标题
+            //string[] ratio = data.getNameValueArr("ratio");//该课程的进度
+            //string[] lessonId = data.getNameValueArr("contentId");//lessonId
+            //string[] imgs = data.getNameValueArr("imgUrl");//课程封面
+            //string[] type = data.getNameValueArr("contentTypeName");
+            var data = new course_data(json_data);//初始化数据类
+            if (status == 0) unfinished_data = data;
 
-
-            int item_amount = titles.Length;
+            //int item_amount = titles.Length;
             FlowLayoutPanel panel = status == 0 ? notlist : finishlist;
 
             //为panel添加自定义控件
-            for (int i = 0; i < item_amount; i++)
+            for (int i = 0; i < data.amout; i++)
             {
 
                 var item = new courseitem
                 {
                     //传参
                     index = i + 1,//课程结束从1开始，要加1
-                    title = titles[i],
-                    ratio = ratio[i],
-                    lessonId = lessonId[i],
-                    imgurl = imgs[i],
-                    type = type[i],
+                    title = data.title[i],
+                    ratio = data.ratio[i],
+                    lessonId = data.content_id[i],
+                    type = data.contentType[i],
 
                 };
 
@@ -205,13 +218,14 @@ namespace ewt360
 
         private void button4_Click(object sender, EventArgs e)
         {
-            string[] contentId = incomplete.getNameValueArr("contentId");
-            string[] parentContentId = incomplete.getNameValueArr("parentContentId");
-            string[] length = incomplete.getNameValueArr("duration");
-            string[] type = incomplete.getNameValueArr("contentTypeName");
+            //获取的是未完成的，就是unfinished_data
+            //string[] contentId = incompletedata.getNameValueArr("contentId");
+            //string[] parentContentId = incompletedata.getNameValueArr("parentContentId");
+            //string[] length = incompletedata.getNameValueArr("duration");
+            //string[] type = incompletedata.getNameValueArr("contentTypeName");
 
             //判断是否需要看课还是试卷
-            if (contentId.Length == 0)
+            if (unfinished_data.amout == 0)
             {
                 //Console.WriteLine("当日没有课程！");
                 MessageBox.Show("该天没有课程需要看！");
@@ -221,24 +235,22 @@ namespace ewt360
             }
 
 
-            for (int i = 0; i < contentId.Length; i++)
+            for (int i = 0; i < unfinished_data.amout; i++)
             {
-                if (jump)
-                {
-                    jump = false;
-                    return;
-                }
-
-                if (type[i] == "试卷")
+                
+                if (unfinished_data.contentType[i] == "试卷")
                 {
                     //MessageBox.Show("试卷不需要看！");
                     Console.WriteLine("已经为你跳过试卷了！");
                     continue;
                 }
                 //new Form1(contentId[i], parentContentId[i], int.Parse(length[i])).ShowDialog();
-                var frm = new finishCourse(parentContentId[i], contentId[i], int.Parse(length[i]));
+                var frm = new finishCourse(
+                    unfinished_data.course_id[i], 
+                    unfinished_data.content_id[i], 
+                    int.Parse(unfinished_data.length[i]));
 
-                frm.ShowDialog();
+                if (frm._showDialog()) return;
 
                 display();//刷新菜单
             }
@@ -247,7 +259,12 @@ namespace ewt360
 
         private void button5_Click(object sender, EventArgs e)
         {
-            new Quick_Complete(incomplete.getNameValueArr("parentContentId")[0], incomplete.getNameValueArr("contentId")[0], incomplete.getNameValueArr("duration")[0]).ShowDialog();
+            //new Quick_Complete(incomplete.getNameValueArr("parentContentId")[0], incomplete.getNameValueArr("contentId")[0], incomplete.getNameValueArr("duration")[0]).ShowDialog();
+            new Quick_Complete()
+            {
+                unfinished = unfinished_data
+            }
+            .ShowDialog();
         }
 
         private void button6_Click(object sender, EventArgs e)

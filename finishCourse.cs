@@ -21,6 +21,9 @@ namespace ewt360
         private string beginTS;//开始请求的时间戳
         private string uuid;
 
+        private bool ifexist = false;
+
+
         public finishCourse(string a, string b, int c)
         {
             InitializeComponent();
@@ -34,6 +37,13 @@ namespace ewt360
             //显示视频时间
             label1.Text = (int)(length / 60) + ":" + length % 60;
         }
+
+        public bool _showDialog()
+        {
+            this.ShowDialog();
+            return ifexist;
+        }
+
         private string getSignature(string action, string duration, string ts)
         {
             string data = $"action={action}&duration={duration}&mstid={UserInfo.token}&signatureMethod=HMAC-SHA1&signatureVersion=1.0&timestamp={ts}&version=2022-08-02";
@@ -47,12 +57,12 @@ namespace ewt360
         private string getUUID()
         {
             //8为uuid，随机字符串加一个_
-            const string chars = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890abcdefghigklmnopqrstuvwxyzabcdefghigklmnopqrstuvwxyzabcdefghigklmnopqrstuvwxyzabcdefghigklmnopqrstuvwxyzabcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZABCDEFGHIGKLMNOPQRSTUVWXYZABCDEFGHIGKLMNOPQRSTUVWXYZABCDEFGHIGKLMNOPQRSTUVWXYZABCDEFGHIGKLMNOPQRSTUVWXYZ";
+            const string chars = "1234567890abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ";
             char[] uuid = new char[8];
 
             for (int i = 0; i < 8; i++)
             {
-                uuid[i] = chars[new Random().Next(390)];
+                uuid[i] = chars[new Random().Next(62)];
             }
 
             return uuid + "_";
@@ -116,9 +126,11 @@ namespace ewt360
             timer1.Enabled = true;
         }
 
-        private void finishCourse_FormClosed(object sender, FormClosedEventArgs e)
+        private void finishCourse_FormClosing(object sender, FormClosingEventArgs e)
         {
-            main.jump = true;
+            var re = MessageBox.Show("Do you really want to exit?", "Exit", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            if (re == DialogResult.Cancel) e.Cancel = true;
+            else ifexist = true;
         }
     }
 }

@@ -17,8 +17,11 @@
         public const string getHomeworkSummaryInfo = "https://gateway.ewt360.com/api/homeworkprod/homework/student/holiday/getHomeworkSummaryInfo?schoolId={0}&sceneId=136";
         public const string getMyClassList = "https://teacher.ewt360.com/api/eteacherproduct/studentManage/getMyClassList";
         public const string getPlayerLessonConfig = "https://gateway.ewt360.com/api/homeworkprod/player/getPlayerLessonConfig";
-        public const string getreportId = "https://web.ewt360.com/customerApi/api/studyprod/web/answer/report?paperId={0}&platform=1&bizCode=204&reportId=0&isRepeat=1";
-        public const string getPaperAnswer = "https://web.ewt360.com/customerApi/api/studyprod/web/answer/webreport?platform=1&reportId={0}&userId={1}&bizCode=204";
-        public const string clog = "https://https://clog.ewt360.com/?TrUserId={0}&TrLessonId={1}&TrUuId={2}&TrVideoBizCode=2013&TrFallback=0&reqId=138248612-1508d0ea-b9f0-4c8c-aac3-52b8e75a9a22";
+        public const string clog = "https://clog.ewt360.com/?TrUserId={0}&TrLessonId={1}&TrUuId={2}&TrVideoBizCode=2013&TrFallback=0";
+
+        public const string getReportId="https://web.ewt360.com/api/answerprod/web/answer/report?paperId={0}&platform=1&bizCode={1}&reportId=0&homeworkId={2}";
+        public const string getQuestionId="https://web.ewt360.com/api/answerprod/common/answer/answerSheetInfo";
+        public const string getPaperRightAnswer="https://web.ewt360.com/api/answerprod/web/answer/webreport/questionGroup?paperId={0}reportId={1}&platform=1&bizCode={2}&homeworkId={3}&userId={4}";
+        public const string SubmitAnswer="https://web.ewt360.com/api/answerprod/web/answer/submitanswer";
     }
 }

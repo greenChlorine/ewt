@@ -5,7 +5,10 @@ namespace ewt360
     public class json
     {
         public string jsonData;
-        public json(string data) { jsonData = data.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("[", "").Replace("]", ""); }
+        public json(string data) 
+        {
+            jsonData = data.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("[", "").Replace("]", ""); 
+        }
 
         public string getNameValue(string key)
         {

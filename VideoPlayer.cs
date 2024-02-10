@@ -36,8 +36,8 @@ namespace ewt360
             string psign = resp.getNameValue("psign");
 
             //获取uuid和videoId为下一步drmToken的网址部分做准备
-            string uuid = resp.getNameValueArr("platFormUuId")[1];//因为第一个返回为空
-            string videoId = resp.getNameValueArr("videoId")[1];
+            string uuid = resp.getNameValueArr("platFormUuId")[0];//因为第一个返回为空
+            string videoId = resp.getNameValueArr("videoId")[0];
             //初始key和iv为32位0和16位0，公钥加密后得到
             const string cipheredOverlayKey = "0fbfdba4a1ba025a1d64b557a1919c4a9eb9d3d13321dfeafb0abc1d126e01df720ed6852ffc3205b18c025d78a272804a4ff8ef9b7f293ff681c0180fc42f9297fef70eed116246db139a6c7e7981c6bb5a50e08af1274dedf6a96d86113264b5d1f083bca432e958ae17f2668c7043af1ee40fcc88945d0badf2b0b12098d1";
             const string cipheredOverlayIv = "5425f8bd243df601379bab09b3a18390d156b6ca1740a52c8b1f7ce02d48fd9f3a0bad1ddc864fc0cb9983e05b9d11ded287240718dbac38d3d21cb405f457df08da0a565fe0ff8a66f884bb44df49e387787fe80a4cffe1f74ed26bd22939f07f14a3be0b41316a2f563506423b0a1627efb7a9b1c3b2251a793b0d737598b0";
@@ -81,11 +81,11 @@ namespace ewt360
             string paperId = req.getNameValue("paperId");
 
 
-            string reportId = new json(request.get(string.Format(ewt.getreportId, paperId), true)).getNameValue("reportId");
+            //string reportId = new json(request.get(string.Format(ewt.getreportId, paperId), true)).getNameValue("reportId");
             string questionCount = req.getNameValue("questionCount");
 
-            json answers = new json(request.get(string.Format(ewt.getPaperAnswer, reportId, UserInfo.userid), true));
-            new paperfrm(answers, int.Parse(questionCount)).Show();
+            //json answers = new json(request.get(string.Format(ewt.getPaperAnswer, reportId, UserInfo.userid), true));
+            //new paperfrm(answers, int.Parse(questionCount)).Show();
         }
 
         private void VideoPlayer_FormClosed(object sender, FormClosedEventArgs e)

@@ -45,7 +45,7 @@ namespace ewt360
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
             req.Method = "POST";
             req.ContentType = "application/json";
-            req.Timeout = 15000;
+            req.Timeout = 30000;
             if (iftoken)
             {
                 req.Headers.Add("token", UserInfo.token);

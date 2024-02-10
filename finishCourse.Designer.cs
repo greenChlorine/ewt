@@ -70,7 +70,7 @@
             this.Controls.Add(this.label1);
             this.Name = "finishCourse";
             this.Text = "Finish The Course";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.finishCourse_FormClosed);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.finishCourse_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

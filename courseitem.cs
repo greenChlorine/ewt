@@ -4,18 +4,17 @@ using System.Windows.Forms;
 
 namespace ewt360
 {
-    public partial class courseitem : UserControl, IDisposable
+    public partial class courseitem : UserControl
     {
         public string title;
         public string lessonId;
-        public string imgurl;
+        //public string imgurl;
         public string ratio;
         public string type;
         public int index;
         public courseitem()
         {
             InitializeComponent();
-            //label3.Text = double.Parse(_ratio)*100+"%";
         }
 
         private void courseitem_Load(object sender, EventArgs e)
@@ -34,6 +33,9 @@ namespace ewt360
             if (type == "试卷")
             {
                 ratiobar.Visible = false;
+                button1.Visible = false;
+                button2.Visible = false;
+                paperbtn.Visible = true;
                 typeimg.Image = Resources.paper;
             }
             else
@@ -48,6 +50,7 @@ namespace ewt360
         private void button1_Click(object sender, EventArgs e)
         {
             new VideoPlayer(lessonId).ShowDialog();
+            //MessageBox.Show("This function is building!", "Not Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -70,16 +73,32 @@ namespace ewt360
             { MessageBox.Show("Cannot find the pdf source!"); }
         }
 
-        private void courseitem_ControlRemoved(object sender, ControlEventArgs e)
+        private void paperbtn_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("");
+            //这里是完成试卷的实验代码
+            /*
+             * 基本思路：
+             * 1.首先获取试卷的reportId和paperId
+             * paperId就是contentId
+             * reportId需要发送请求获取
+             * 
+             * 2.获取questId
+             * 
+             * 3.先submintpaper提交试卷，但是这时试卷还没有批改。
+             * 因为不提交试卷，是获取不到正确答案的，又因为没有批改，所以Submitanswer后完成批改是有分数的
+             * 
+             * 4.循环提交答案（可能需要delay）
+             * 
+             * 5.完成批改
+             */
+            const string bizCode = "205";
+
+            string paperId = lessonId;
+            string reportId = new json(request.get(string.Format(ewt.getReportId, paperId, bizCode, UserInfo.homeworkId), true)).getNameValue("reportId");
+
+            string getQuestionId_json = $"{{\"client\":1,\"paperId\":\"{paperId}\",\"platform\":\"1\",\"reportId\":\"{reportId}\",\"bizCode\":\"{bizCode}\",\"userId\":\"{UserInfo.userid}\"}}";
+            string[] questionIdArr = new json(request.post(true, ewt.getQuestionId, getQuestionId_json)).getNameValueArr("questionId");
+
         }
-
-        private void courseitem_Leave(object sender, EventArgs e)
-        {
-            Console.WriteLine();
-        }
-
-
     }
 }
